@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-export class AlbumService {
+export class ArtistService {
   async findAll() {
     return await this.client.get('');
   }
@@ -12,7 +12,7 @@ export class AlbumService {
 
   constructor() {
     this.client = axios.create({
-      baseURL: process.env.ALBUMS_URL
+      baseURL: process.env.ARTIST_URL
     });
   }
 }
