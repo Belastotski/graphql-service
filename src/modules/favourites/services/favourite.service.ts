@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
+import { headerData } from 'src/data.model';
 
 @Injectable()
-export class UserService {
+export class FavouriteService {
   client: AxiosInstance;
 
   constructor() {
     this.client = axios.create({
-      baseURL: process.env.USER_URL
+      baseURL: process.env.FAVORITE_URL
     });
 
     this.client.interceptors.response.use((res) => {
@@ -24,29 +25,18 @@ export class UserService {
     });
   }
 
-  async login(email: string, password: string) {
-    const res = await this.client.post('/login', { email, password });
+  async findAll(config: headerData['config']) {
+    const res = await this.client.get('/', config);
     return res.data;
   }
 
-  async getById(id: string) {
-    const res = await this.client.get(`/${id}`);
+  async add(type: string, id: string, config: headerData['config']) {
+    const res = await this.client.put('/add', { type, id }, config);
     return res.data;
   }
 
-  async register(
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string
-  ) {
-    const res = await this.client.post('/register', {
-      firstName,
-      lastName,
-      email,
-      password
-    });
-
+  async remove(type: string, id: string, config: headerData['config']) {
+    const res = await this.client.put('/remove', { type, id }, config);
     return res.data;
   }
 }

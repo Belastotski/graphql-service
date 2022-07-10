@@ -1,83 +1,68 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import {
+  Resolver,
+  Parent,
+  Args,
+  Query,
+  Mutation,
+  Context,
+  ResolveField
+} from '@nestjs/graphql';
+import { Artist, CreateArtistInput, UpdateArtistInput } from 'src/graphql';
+import { BandService } from 'src/modules/bands/services/band.service';
 import { headerData } from 'src/data.model';
-import { ArtistsService } from '../services/artist.service';
+import { ArtistService } from '../services/artist.service';
 
 @Resolver('Artist')
-export class ArtistsResolver {
-  constructor(private readonly artistsService: ArtistsService) {}
+export class ArtistResolver {
+  constructor(
+    private readonly artistService: ArtistService,
+    private readonly bandService: BandService
+  ) {}
 
-  @Mutation('createArtist')
-  create(
-    @Args('firstName') firstName: string,
-    @Args('secondName') secondName: string,
-    @Args('middleName') middleName: string,
-    @Args('birthDate') birthDate: string,
-    @Args('birthPlace') birthPlace: string,
-    @Args('country') country: string,
-    @Args('bands') bands: string[],
-    @Args('instruments') instruments: string[],
-    @Context() ctx: headerData
-  ) {
-    const { config } = ctx;
-
-    return this.artistsService.create(
-      firstName,
-      secondName,
-      middleName,
-      birthDate,
-      birthPlace,
-      country,
-      bands,
-      instruments,
-      config
-    );
+  @Resolver()
+  @ResolveField()
+  async bands(@Parent() artist: Artist & { bandsIds: string[] }) {
+    const { bandsIds } = artist;
+    return bandsIds.map((bandId) => this.bandService.findOne(bandId));
   }
 
   @Query('artists')
   findAll(
-    @Args('limit', { defaultValue: 10 }) limit: number,
+    @Args('limit', { defaultValue: 5 }) limit: number,
     @Args('offset', { defaultValue: 0 }) offset: number
   ) {
-    return this.artistsService.findAll(limit, offset);
+    return this.artistService.findAll(limit, offset);
   }
 
   @Query('artist')
   findOne(@Args('id') id: string) {
-    return this.artistsService.findOne(id);
+    return this.artistService.findOne(id);
+  }
+
+  @Mutation('createArtist')
+  create(
+    @Args('createArtistInput') createArtistInput: CreateArtistInput,
+    @Context() header: headerData
+  ) {
+    const { config } = header;
+
+    return this.artistService.create(createArtistInput, config);
   }
 
   @Mutation('updateArtist')
   update(
     @Args('id') id: string,
-    @Args('firstName') firstName: string,
-    @Args('secondName') secondName: string,
-    @Args('middleName') middleName: string,
-    @Args('birthDate') birthDate: string,
-    @Args('birthPlace') birthPlace: string,
-    @Args('country') country: string,
-    @Args('bands') bands: string[],
-    @Args('instruments') instruments: string[],
-    @Context() ctx: headerData
+    @Args('updateArtistInput') updateArtistInput: UpdateArtistInput,
+    @Context() header: headerData
   ) {
-    const { config } = ctx;
+    const { config } = header;
 
-    return this.artistsService.update(
-      id,
-      firstName,
-      secondName,
-      middleName,
-      birthDate,
-      birthPlace,
-      country,
-      bands,
-      instruments,
-      config
-    );
+    return this.artistService.update(id, updateArtistInput, config);
   }
 
   @Mutation('deleteArtist')
-  remove(@Args('id') id: string, @Context() ctx: headerData) {
-    const { config } = ctx;
-    return this.artistsService.remove(id, config);
+  remove(@Args('id') id: string, @Context() header: headerData) {
+    const { config } = header;
+    return this.artistService.remove(id, config);
   }
 }

@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { CreateArtistInput, UpdateArtistInput } from 'src/graphql';
 import axios, { AxiosInstance } from 'axios';
+import { CreateGenreInput, UpdateGenreInput } from 'src/graphql';
 import { headerData } from 'src/data.model';
 
 @Injectable()
-export class ArtistService {
+export class GenreService {
   client: AxiosInstance;
 
   constructor() {
     this.client = axios.create({
-      baseURL: process.env.ARTIST_URL
+      baseURL: process.env.GENRE_URL
     });
 
     this.client.interceptors.response.use((res) => {
@@ -26,43 +26,37 @@ export class ArtistService {
     });
   }
 
-  async create(
-    createArtistInput: CreateArtistInput,
-    config: headerData['config']
-  ) {
-    const res = await this.client.post('/', createArtistInput, config);
-    return res.data;
-  }
-
   async findAll(limit: number, offset: number) {
     const res = await this.client.get('/', {
       params: { limit, offset }
     });
-
     return res.data.items;
   }
-
   async findOne(id: string) {
     if (!id) return null;
-    try {
-      const res = await this.client.get(`/${id}`);
-      return res.data;
-    } catch (err) {
-      return null;
-    }
+    const res = await this.client.get(`/${id}`);
+    return res.data;
+  }
+
+  async create(
+    createGenreInput: CreateGenreInput,
+    header: headerData['config']
+  ) {
+    const res = await this.client.post('/', createGenreInput, header);
+    return res.data;
   }
 
   async update(
     id: string,
-    updateArtistInput: UpdateArtistInput,
-    config: headerData['config']
+    updateGenreInput: UpdateGenreInput,
+    header: headerData['config']
   ) {
-    const res = await this.client.put(`/${id}`, updateArtistInput, config);
+    const res = await this.client.put(`/${id}`, updateGenreInput, header);
     return res.data;
   }
 
-  async remove(id: string, config: headerData['config']) {
-    const res = await this.client.delete(`/${id}`, config);
+  async remove(id: string, header: headerData['config']) {
+    const res = await this.client.delete(`/${id}`, header);
     return res.data;
   }
 }

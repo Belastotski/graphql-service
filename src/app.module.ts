@@ -1,38 +1,43 @@
+import 'dotenv/config';
 import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import axios from 'axios';
+import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
-// import { ArtistsModule } from './modules/artists/artists.module';
-// import { BandsModule } from './modules/bands/bands.module';
-// import { GenresModule } from './modules/genres/genres.module';
-// import { TracksModule } from './modules/tracks/tracks.module';
-// import { UsersModule } from './modules/users/users.module';
+import { AlbumModule } from './modules/albums/album.module';
+import { ArtistModule } from './modules/artists/artist.module';
+import { BandModule } from './modules/bands/band.module';
+import { GenreModule } from './modules/genres/genre.module';
+import { FavouriteModule } from './modules/favourites/favourite.module';
+import { TrackModule } from './modules/tracks/track.module';
+import { UserModule } from './modules/users/user.module';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      typePaths: ['./modules/**/*.graphql'],
+      typePaths: ['./**/*.graphql'],
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
         outputAs: 'class'
       },
       context: ({ req }) => {
+        const token: string = req.headers.authorization || '';
         return {
           config: {
             headers: {
-              Authorization: req.headers.authorization || ''
+              Authorization: token
             }
           }
-        }
+        };
       }
-    })
-    // ArtistsModule,
-    // BandsModule,
-    // GenresModule,
-    // TracksModule
-    // UsersModule,
+    }),
+    AlbumModule,
+    ArtistModule,
+    BandModule,
+    GenreModule,
+    FavouriteModule,
+    TrackModule,
+    UserModule
   ]
 })
 export class AppModule {}
