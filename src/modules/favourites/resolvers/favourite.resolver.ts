@@ -82,40 +82,5 @@ export class FavouriteResolver {
     const { config } = header;
     return this.favouriteService.add('genres', id, config);
   }
-
-  @Mutation('removeTrackToFavourites')
-  removeTrackToFavourites(
-    @Args('id') id: string,
-    @Context() header: headerData
-  ) {
-    const { config } = header;
-    return this.favouriteService.remove('tracks', id, config);
-  }
-
-  @Mutation('removeBandToFavourites')
-  @Mutation('removeArtistToFavourites')
-  removeArtistToFavourites(
-    @Args('id') id: string,
-    @Context() header: headerData
-  ) {
-    const { config } = header;
-    return this.favouriteService.remove('artists', id, config);
-  }
-
-  removeBandToFavourites(
-    @Args('id') id: string,
-    @Context() header: headerData
-  ) {
-    const { config } = header;
-    return this.favouriteService.remove('bands', id, config);
-  }
-
-  @Mutation('removeGenreToFavourites')
-  removeGenreToFavourites(
-    @Args('id') id: string,
-    @Context() header: headerData
-  ) {
-    const { config } = header;
-    return this.favouriteService.remove('genres', id, config);
-  }
+ 
 }
